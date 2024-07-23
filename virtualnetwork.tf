@@ -9,12 +9,13 @@ resource "azurerm_virtual_network" "vnet" {
   location            = var.resource_group_location
   resource_group_name = var.resource_group_name_prefix
   address_space       = ["10.0.0.0/16"]
+}
 
-
-  subnet {
-    name           = "acme-subnet"
-    address_prefix = "10.0.0.0/24"
-  }
+resource "azurerm_subnet" "acme_subnet" {
+  name = "acme-subnet"
+  resource_group_name = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes = ["10.0.0.0/24"]
 }
 
 resource "azurerm_network_interface" "acme-nic" {
@@ -24,7 +25,9 @@ resource "azurerm_network_interface" "acme-nic" {
     resource_group_name = var.resource_group_name_prefix
 
     ip_configuration {
-      name = "nic-${}"
+      name = "nic-${count.index}"
+      subnet_id = azurerm_subnet.acme_subnet.id
+      private_ip_address_allocation = "Dynamic"
     }
 
 }
