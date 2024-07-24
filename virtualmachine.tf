@@ -1,12 +1,12 @@
 resource "azurerm_linux_virtual_machine" "acme-vm" {
-  count = 2
+  count               = 2
   name                = "acme-vm${count.index}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_DS1_V2"
   admin_username      = "acmeadmin"
   network_interface_ids = [
-    azurerm_network_interface.acme-nic.id,
+    azurerm_network_interface.acme-nic[count.index].id,
   ]
 
   admin_ssh_key {
@@ -15,7 +15,7 @@ resource "azurerm_linux_virtual_machine" "acme-vm" {
 
   }
 
-os_disk {
+  os_disk {
     name                 = "vm-disk"
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"
