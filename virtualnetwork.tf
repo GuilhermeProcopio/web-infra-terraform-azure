@@ -1,7 +1,7 @@
 resource "azurerm_network_security_group" "vnet-security-group" {
-  name                = "example-security-group"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  name                = "acme-security-group"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
 resource "azurerm_public_ip" "public-ip" {
