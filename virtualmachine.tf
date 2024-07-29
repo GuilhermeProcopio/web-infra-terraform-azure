@@ -1,19 +1,23 @@
 resource "azurerm_linux_virtual_machine" "acme-vm" {
-  count               = 2
-  name                = "acme-vm${count.index}"
+  depends_on          = [azurerm_network_interface.acme-nic]
+  name                = "acme-vm-1"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   size                = "Standard_DS1_V2"
-  admin_username      = "acmeadmin"
   network_interface_ids = [
-    azurerm_network_interface.acme-nic[count.index].id,
+    azurerm_network_interface.acme-nic.id,
   ]
 
   admin_ssh_key {
-    username   = "acmeadmin"
+    username   = var.vm_user
     public_key = azapi_resource_action.ssh_public_key_gen.output.publicKey
 
   }
+
+  computer_name = "vm-acme"
+
+  admin_username = var.vm_user
+
 
   os_disk {
     name                 = "vm-disk"
