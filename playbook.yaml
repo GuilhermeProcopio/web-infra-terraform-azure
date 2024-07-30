@@ -82,5 +82,5 @@
     - name: Configurar agente do Datadog
       copy:
         content: |
-          api_key: <YOUR_DATADOG_API_KEY>
+          api_key: <colocar a api do datadog aqui>
         dest: /etc/dat
