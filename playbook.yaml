@@ -1,0 +1,86 @@
+---
+- name: Configurar VMs
+  hosts: all
+  become: true
+  vars:
+    user_name: acmeuser
+    user_password: "{{ 'aulapuc1234' | password_hash('sha512') }}"
+  tasks:
+    - name: Criar usuário acmeuser com senha
+      user:
+        name: "{{ user_name }}"
+        password: "{{ user_password }}"
+        state: present
+        createhome: yes
+
+- name: Configurar VMs do grupo web
+  hosts: web
+  become: true
+  tasks:
+    - name: Instalar nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Habilitar e iniciar nginx
+      systemd:
+        name: nginx
+        enabled: yes
+        state: started
+
+    - name: Criar arquivo index.html
+      copy:
+        content: "{{ ansible_hostname }}"
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: '0644'
+
+- name: Configurar VMs do grupo db
+  hosts: db
+  become: true
+  tasks:
+    - name: Instalar postgres
+      apt:
+        name: postgresql
+        state: present
+        update_cache: yes
+
+    - name: Habilitar e iniciar postgres
+      systemd:
+        name: postgresql
+        enabled: yes
+        state: started
+
+- name: Configurar Datadog em todas as VMs
+  hosts: all
+  become: true
+  tasks:
+    - name: Instalar dependências
+      apt:
+        name: "apt-transport-https"
+        state: present
+        update_cache: yes
+
+    - name: Adicionar chave do Datadog
+      apt_key:
+        url: https://keys.datadoghq.com/DATADOG_APT_KEY.public
+        state: present
+
+    - name: Adicionar repositório do Datadog
+      apt_repository:
+        repo: "deb https://apt.datadoghq.com/ stable 7"
+        state: present
+
+    - name: Instalar agente do Datadog
+      apt:
+        name: datadog-agent
+        state: present
+        update_cache: yes
+
+    - name: Configurar agente do Datadog
+      copy:
+        content: |
+          api_key: <YOUR_DATADOG_API_KEY>
+        dest: /etc/dat
