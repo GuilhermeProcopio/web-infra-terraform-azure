@@ -50,8 +50,20 @@ resource "azurerm_subnet" "acme_subnet" {
   address_prefixes     = ["10.0.0.0/24"]
 }
 
-resource "azurerm_network_interface" "acme-nic" {
-  name                = "acme-vm-nic"
+resource "azurerm_network_interface" "acme-nic-1" {
+  name                = "acme-vm-nic-1"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "nic"
+    subnet_id                     = azurerm_subnet.acme_subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_network_interface" "acme-nic-2" {
+  name                = "acme-vm-nic-2"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
